@@ -63,9 +63,9 @@ def run_async(coro):
 
 # ---- Sidebar ------------------------------------------------------------------------------
 st.sidebar.header("Model Connection")
-default_model = os.environ.get("NEELFEEL_MODEL", "accounts/fireworks/models/deepseek-v4-pro-0813")
-default_base_url = os.environ.get("FIREWORKS_BASE_URL", "https://api.fireworks.ai/inference/v1")
-default_api_key = os.environ.get("FIREWORKS_API_KEY", "")
+default_api_key = os.environ.get("FIREWORKS_API_KEY") or st.secrets.get("FIREWORKS_API_KEY", "")
+default_base_url = os.environ.get("FIREWORKS_BASE_URL") or st.secrets.get("FIREWORKS_BASE_URL", "https://api.fireworks.ai/inference/v1")
+default_model = os.environ.get("NEELFEEL_MODEL") or st.secrets.get("NEELFEEL_MODEL", "accounts/fireworks/models/deepseek-v4p1-flash-1017")
 
 model_name = st.sidebar.text_input("Model", value=default_model, key="cfg_model")
 base_url = st.sidebar.text_input("Base URL", value=default_base_url, key="cfg_base_url")
