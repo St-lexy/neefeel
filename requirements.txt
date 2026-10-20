@@ -8,3 +8,4 @@ openai>=1.30
 pinecone>=5.0
 # development
 pytest>=8.0
+graphviz
