@@ -1,0 +1,10 @@
+autogen-agentchat>=0.7,<0.8
+autogen-ext[openai]>=0.7,<0.8
+pydantic>=2.0
+python-dotenv>=1.0
+streamlit>=1.35
+openai>=1.30
+# optional: persistent vector memory
+pinecone>=5.0
+# development
+pytest>=8.0
