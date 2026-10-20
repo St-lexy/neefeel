@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>InvoiceLite — Simple Invoices in NGN</title>
+<meta name="description" content="InvoiceLite — a client-side invoice builder for Nigerian freelancers. All data stays in your browser." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="stylesheet" href="styles.css" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230f766e'/%3E%3Ctext x='50' y='68' font-size='54' font-family='monospace' fill='white' text-anchor='middle'%3E%E2%82%A6%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+
+<a class="skip-link" href="#items">Skip to line items</a>
+
+<header class="topbar no-print">
+  <div class="topbar-inner">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">₦</span>
+      <span class="brand-text">
+        <strong>InvoiceLite</strong>
+        <small>Invoices for Nigerian freelancers</small>
+      </span>
+    </div>
+    <div class="topbar-actions">
+      <span class="badge badge-privacy" title="No server, no database. Everything is stored in this browser only.">
+        <span class="dot" aria-hidden="true"></span> Local-only data
+      </span>
+      <button type="button" class="btn btn-ghost" id="btnPrint">
+        <span aria-hidden="true">🖨</span> Print / PDF
+      </button>
+      <button type="button" class="btn btn-ghost btn-danger-ghost" id="btnReset">Reset</button>
+    </div>
+  </div>
+</header>
+
+<main class="layout">
+
+  <!-- ============ FORM ============ -->
+  <section class="panel no-print" aria-labelledby="formHeading">
+    <div class="panel-head">
+      <h1 id="formHeading">Create an invoice</h1>
+      <p class="muted">Everything you type is saved automatically in this browser.</p>
+    </div>
+
+    <!-- Business / client -->
+    <fieldset class="group">
+      <legend>Your business</legend>
+      <div class="grid-2">
+        <label class="field">
+          <span>Business name</span>
+          <input type="text" id="bizName" placeholder="Adaeze Design Studio" autocomplete="organization" />
+        </label>
+        <label class="field">
+          <span>Phone / email</span>
+          <input type="text" id="bizContact" placeholder="hello@adaeze.ng · 0803 000 0000" autocomplete="off" />
+        </label>
+      </div>
+      <label class="field">
+        <span>Address</span>
+        <textarea id="bizAddress" rows="2" placeholder="12 Adeola Odeku St, Victoria Island, Lagos"></textarea>
+      </label>
+    </fieldset>
+
+    <fieldset class="group">
+      <legend>Bill to</legend>
+      <div class="grid-2">
+        <label class="field">
+          <span>Client name</span>
+          <input type="text" id="clientName" placeholder="Tunde Bakare" autocomplete="name" />
+        </label>
+        <label class="field">
+          <span>Client contact</span>
+          <input type="text" id="clientContact" placeholder="tunde@example.com" autocomplete="off" />
+        </label>
+      </div>
+      <label class="field">
+        <span>Client address</span>
+        <textarea id="clientAddress" rows="2" placeholder="4 Ozumba Mbadiwe Ave, Ikoyi, Lagos"></textarea>
+      </label>
+    </fieldset>
+
+    <!-- Invoice meta -->
+    <fieldset class="group">
+      <legend>Invoice details</legend>
+      <div class="grid-3">
+        <label class="field">
+          <span>Invoice number</span>
+          <input type="text" id="invoiceNumber" readonly class="readonly" title="Auto-generated and persisted" />
+        </label>
+        <label class="field">
+          <span>Issue date</span>
+          <input type="date" id="issueDate" />
+        </label>
+        <label class="field">
+          <span>Due date</span>
+          <input type="date" id="dueDate" />
+        </label>
+      </div>
+    </fieldset>
+
+    <!-- Line items -->
+    <fieldset class="group" id="items">
+      <legend>Line items</legend>
+      <div class="items-head" aria-hidden="true">
+        <span>Description</span>
+        <span>Qty</span>
+        <span>Unit price (₦)</span>
+        <span>Amount</span>
+        <span></span>
+      </div>
+
+      <div id="itemsList" class="items-list"></div>
+
+      <div class="items-foot">
+        <button type="button" class="btn btn-secondary" id="btnAddItem">+ Add line item</button>
+        <p class="muted tiny" id="itemsEmptyHint">Add at least one line item to issue an invoice.</p>
+      </div>
+    </fieldset>
+
+    <!-- Extra -->
+    <fieldset class="group">
+      <legend>Notes &amp; tax</legend>
+      <div class="grid-2">
+        <label class="field">
+          <span>Tax / VAT rate (%)</span>
+          <input type="number" id="taxRate" min="0" max="100" step="0.5" value="0" inputmode="decimal" />
+        </label>
+        <label class="field">
+          <span>Amount paid (₦)</span>
+          <input type="number" id="amountPaid" min="0" step="0.01" value="0" inputmode="decimal" />
+        </label>
+      </div>
+      <label class="field">
+        <span>Notes / payment terms</span>
+        <textarea id="notes" rows="3" placeholder="Payment due within 14 days. Bank transfer to Adaeze Design Studio, GTBank 0123456789."></textarea>
+      </label>
+    </fieldset>
+
+    <div class="panel-actions">
+      <button type="button" class="btn btn-secondary" id="btnPrint2">Print / Save as PDF</button>
+      <button type="button" class="btn btn-primary" id="btnNewInvoice">Start new invoice</button>
+    </div>
+    <p class="muted tiny footnote">
+      PDF export, login and multi-user sharing are out of scope for this build. Use your browser's
+      “Print → Save as PDF” if you need a file.
+    </p>
+  </section>
+
+  <!-- ============ PREVIEW ============ -->
+  <section class="preview-wrap" aria-labelledby="previewHeading">
+    <h2 id="previewHeading" class="preview-label no-print">Live preview</h2>
+
+    <article class="invoice" id="invoicePreview" aria-live="polite">
+      <header class="inv-head">
+        <div class="inv-head-left">
+          <h3 class="inv-title">INVOICE</h3>
+          <p class="inv-number" id="pvNumber">INV-001</p>
+        </div>
+        <div class="inv-head-right">
+          <p class="inv-biz" id="pvBizName">Your business name</p>
+          <p class="inv-line" id="pvBizContact">Contact details</p>
+          <p class="inv-line pre" id="pvBizAddress">Address</p>
+        </div>
+      </header>
+
+      <div class="inv-meta">
+        <div>
+          <p class="label">Billed to</p>
+          <p class="strong" id="pvClientName">Client name</p>
+          <p class="inv-line" id="pvClientContact"></p>
+          <p class="inv-line pre" id="pvClientAddress"></p>
+        </div>
+        <div class="inv-meta-dates">
+          <p class="label">Issued</p>
+          <p class="strong" id="pvIssueDate">—</p>
+          <p class="label">Due</p>
+          <p class="strong" id="pvDueDate">—</p>
+        </div>
+      </div>
+
+      <table class="inv-table">
+        <caption class="visually-hidden">Invoice line items</caption>
+        <thead>
+          <tr>
+            <th scope="col">Description</th>
+            <th scope="col" class="num">Qty</th>
+            <th scope="col" class="num">Unit (₦)</th>
+            <th scope="col" class="num">Amount (₦)</th>
+          </tr>
+        </thead>
+        <tbody id="pvItems"></tbody>
+      </table>
+
+      <div class="inv-summary">
+        <div class="inv-notes">
+          <p class="label">Notes</p>
+          <p class="pre" id="pvNotes">—</p>
+        </div>
+        <dl class="totals">
+          <div class="totals-row">
+            <dt>Subtotal</dt>
+            <dd id="pvSubtotal">₦0.00</dd>
+          </div>
+          <div class="totals-row" id="taxRow" hidden>
+            <dt>Tax / VAT <span id="pvTaxRateLabel">(0%)</span></dt>
+            <dd id="pvTax">₦0.00</dd>
+          </div>
+          <div class="totals-row totals-total">
+            <dt>Total</dt>
+            <dd id="pvTotal">₦0.00</dd>
+          </div>
+          <div class="totals-row" id="paidRow" hidden>
+            <dt>Amount paid</dt>
+            <dd id="pvPaid">₦0.00</dd>
+          </div>
+          <div class="totals-row totals-balance" id="balanceRow" hidden>
+            <dt>Balance due</dt>
+            <dd id="pvBalance">₦0.00</dd>
+          </div>
+        </dl>
+      </div>
+
+      <footer class="inv-foot">
+        <p>Thank you for your business.</p>
+        <p class="muted tiny">Generated locally with InvoiceLite — no data leaves this device.</p>
+      </footer>
+    </article>
+
+    <p class="privacy-note no-print">
+      <strong>Privacy:</strong> InvoiceLite has no backend, no database and no analytics. Your invoice
+      data lives in this browser's <code>localStorage</code> only and is never transmitted. Clearing
+      site data deletes it permanently.
+    </p>
+  </section>
+</main>
+
+<div class="toast no-print" id="toast" role="status" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
